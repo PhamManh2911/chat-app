@@ -1,0 +1,60 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         Int      @id @default(autoincrement())
+  firstName  String?
+  lastName   String?
+  nickname   String?
+  name       String
+  picture    String?
+  email      String   @unique
+  lastOnline DateTime
+
+  messages    Message[]
+  userToChats UserToChat[]
+}
+
+model Message {
+  id    Int    @id @default(autoincrement())
+  value String
+
+  user   User @relation(fields: [userId], references: [id])
+  userId Int
+  chat   Chat @relation(fields: [chatId], references: [id])
+  chatId Int
+}
+
+model UserToChat {
+  id       Int            @id @default(autoincrement())
+  lastSeen DateTime
+  nickname String?
+  role     UserToChatRole @default(MEMBER)
+
+  user   User @relation(fields: [userId], references: [id])
+  userId Int
+  chat   Chat @relation(fields: [chatId], references: [id])
+  chatId Int
+}
+
+enum UserToChatRole {
+  CREATOR
+  MODERATOR
+  MEMBER
+}
+
+model Chat {
+  id             Int      @id @default(autoincrement())
+  createdAt      DateTime @default(now())
+  numberOfMember Int      @default(2)
+
+  userToChats UserToChat[]
+  messages    Message[]
+}
