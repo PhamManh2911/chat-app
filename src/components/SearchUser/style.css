@@ -1,0 +1,15 @@
+.search-results {
+  transition: all 0.3s ease-in-out;
+}
+
+.slide-down {
+  opacity: 1;
+  z-index: 1;
+  transform: translateY(0%);
+}
+
+.slide-up {
+  opacity: 0;
+  z-index: -1;
+  transform: translateY(-0.5em);
+}

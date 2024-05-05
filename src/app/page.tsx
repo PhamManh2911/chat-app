@@ -1,14 +1,24 @@
-import ProfileServer from "@/components/Login";
+import { getSession } from "@auth0/nextjs-auth0";
 
-async function getFriendships() {}
+import { LOGIN_URL } from "@/config/urls";
+import { redirect } from "next/navigation";
 
-export default function Home() {
-  return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-        <p>Chat App</p>
-        <ProfileServer />
-      </div>
-    </main>
-  );
+type UserClaim = {
+  given_name?: string;
+  family_name?: string;
+  nickname?: string;
+  picture?: string;
+  updated_at: Date;
+  email: string;
+};
+
+declare module "@auth0/nextjs-auth0" {
+  interface Claims extends UserClaim {}
+}
+
+export default async function Home() {
+  const user = (await getSession())?.user;
+
+  if (user) redirect("/chat");
+  else redirect(LOGIN_URL);
 }

@@ -9,39 +9,42 @@ datasource db {
 }
 
 model User {
-  id         Int      @id @default(autoincrement())
-  firstName  String?
-  lastName   String?
-  nickname   String?
-  name       String
-  picture    String?
-  email      String   @unique
-  lastOnline DateTime
-
-  messages    Message[]
+  id          Int          @id @default(autoincrement())
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  firstName   String?
+  lastName    String?
+  nickname    String?
+  name        String
+  picture     String?
+  email       String       @unique
+  lastOnline  DateTime
   userToChats UserToChat[]
 }
 
 model Message {
-  id    Int    @id @default(autoincrement())
-  value String
-
-  user   User @relation(fields: [userId], references: [id])
-  userId Int
-  chat   Chat @relation(fields: [chatId], references: [id])
-  chatId Int
+  id           Int        @id @default(autoincrement())
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  value        String
+  chat         Chat       @relation(fields: [chatId], references: [id])
+  chatId       Int
+  userToChat   UserToChat @relation(fields: [userToChatId], references: [id])
+  userToChatId Int
 }
 
 model UserToChat {
-  id       Int            @id @default(autoincrement())
-  lastSeen DateTime
-  nickname String?
-  role     UserToChatRole @default(MEMBER)
-
-  user   User @relation(fields: [userId], references: [id])
-  userId Int
-  chat   Chat @relation(fields: [chatId], references: [id])
-  chatId Int
+  id          Int            @id @default(autoincrement())
+  createdAt   DateTime       @default(now())
+  lastSeen    DateTime       @default(now())
+  isConnected Boolean        @default(false)
+  nickname    String?
+  role        UserToChatRole @default(MEMBER)
+  user        User           @relation(fields: [userId], references: [id])
+  userId      Int
+  chat        Chat           @relation(fields: [chatId], references: [id])
+  chatId      Int
+  messages    Message[]
 }
 
 enum UserToChatRole {
@@ -51,10 +54,11 @@ enum UserToChatRole {
 }
 
 model Chat {
-  id             Int      @id @default(autoincrement())
-  createdAt      DateTime @default(now())
-  numberOfMember Int      @default(2)
-
-  userToChats UserToChat[]
-  messages    Message[]
+  id             Int          @id @default(autoincrement())
+  name           String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  numberOfMember Int          @default(2)
+  userToChats    UserToChat[]
+  messages       Message[]
 }
