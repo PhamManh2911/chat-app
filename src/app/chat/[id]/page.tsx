@@ -1,22 +1,16 @@
-import { prisma } from "@/services/database";
-import { getSession } from "@auth0/nextjs-auth0";
+import { LOGIN_URL } from "@/config/urls";
+import { getAccessToken } from "@auth0/nextjs-auth0";
 import { redirect } from "next/navigation";
 
-async function getChatHistory(chatId: number) {
-  const sessionUser = (await getSession())?.user;
-
-  if (!sessionUser) redirect("/login");
-  const currentUser = await prisma.user.findUnique({
-    where: { email: sessionUser.email }
-  });
-
-  if (!currentUser) redirect("/login");
-  return await prisma.chat.findUnique({ where: { id: chatId } });
-}
-
 export default async function Page({ params }: { params: { id: string } }) {
-  const chatHistory = await getChatHistory(+params.id);
+  try {
+    const { accessToken } = await getAccessToken();
 
-  console.log(chatHistory);
-  return <div>My posts {params.id}</div>;
+    console.log(params.id);
+    console.log(accessToken);
+
+    return <div>My posts {params.id}</div>;
+  } catch (_) {
+    redirect(LOGIN_URL);
+  }
 }
